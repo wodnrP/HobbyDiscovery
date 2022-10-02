@@ -42,7 +42,7 @@ from django.core.exceptions import ImproperlyConfigured
 SEKRET_KEY = "django-insecure-q&ry(&5u!u_h^_a2=7*18k680njb705&w_6$-m%y#5gm*hjun4"
 DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', 'https://hobbydiscovery.herokuapp.com/']
 
 AUTH_USER_MODEL = 'user.User'
 
