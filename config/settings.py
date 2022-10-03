@@ -26,7 +26,7 @@ import os
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-SEKRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-q&ry(&5u!u_h^_a2=7*18k680njb705&w_6$-m%y#5gm*hjun4')
+SEKRET_KEY = '6!ijk(i_$b=(uuy@mvd178)3jon*a8p8kl%w^c@w%-)+j#w50g'
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -130,7 +130,6 @@ STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'static')
     ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
