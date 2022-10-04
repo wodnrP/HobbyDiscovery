@@ -4,7 +4,7 @@ from .models import Hobby, review
 class HobbySerializer(serializers.ModelSerializer):
     class Meta:
         model = Hobby
-        fields = ('id', 'hobby_name', 'descrition', 'hobby_image') 
+        fields = ('id', 'hobby_title', 'descrition', 'hobby_image') 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
