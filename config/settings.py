@@ -95,7 +95,8 @@ DATABASES = {
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'https://hobbydiscovery.herokuapp.com',
-    'https://localhost:8000'
+    'https://localhost:8000',
+    'https://localhost:3000'
 ]
 
 # Password validation
