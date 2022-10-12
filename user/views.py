@@ -1,6 +1,3 @@
-from signal import raise_signal
-from urllib import response
-from weakref import ref
 from django.shortcuts import render, redirect
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -11,7 +8,6 @@ from rest_framework.authentication import get_authorization_header
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
 from .serializer import UserSerializer
 from .models import User
-from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
 # @api_view(['GET'])                                                                  # 전체 유저 조회

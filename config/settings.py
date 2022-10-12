@@ -47,12 +47,7 @@ INSTALLED_APPS = [
     'community.apps.CommunityConfig',
     'rest_framework',
     'corsheaders',
-    'rest_framework.authtoken'
 ]
-
-REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'core.exceptions.status_code_handler'
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -65,6 +60,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware'
 ]
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -124,7 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'core.exceptions.status_code_handler'
+}
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
