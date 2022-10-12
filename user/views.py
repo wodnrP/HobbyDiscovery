@@ -1,17 +1,24 @@
+from signal import raise_signal
+from urllib import response
+from weakref import ref
 from django.shortcuts import render, redirect
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.exceptions import APIException, AuthenticationFailed
+from rest_framework.authentication import get_authorization_header
+from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
 from .serializer import UserSerializer
 from .models import User
 from django.contrib.auth import authenticate, login, logout
 
 # Create your views here.
-@api_view(['GET'])                                                                  # 전체 유저 조회
-def getUsers(request):                                                             
-    users = User.objects.all()
-    serializer = UserSerializer(users, many = True)
-    return Response(serializer.data)
+# @api_view(['GET'])                                                                  # 전체 유저 조회
+# def getUsers(request):                                                             
+#     users = User.objects.all()
+#     serializer = UserSerializer(users, many = True)
+#     return Response(serializer.data)
 
 @api_view(['GET', 'PATCH', 'DELETE'])                                               # 단일 회원 조회, 수정, 삭제
 def userDetail(request, user_id): 
@@ -29,26 +36,85 @@ def userDetail(request, user_id):
         user.delete()
         return Response({'message':'sucess', 'code' : 200})
 
-@api_view(['POST'])                                                                  # 회원가입
-def signup_view(request): 
-    serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
+# @api_view(['POST'])                                                                  # 회원가입
+# def signup_view(request): 
+#     serializer = UserSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# @api_view(['POST'])                                                                  # 로그인
+# def login_view(request): 
+#     serializer = UserSerializer(data=request.data)
+#     username = serializer.initial_data['username']
+#     password = serializer.initial_data['password']
+#     user = authenticate(request=request, username=username, password=password)
+#     token = Token.objects.get(user=user)
+#     if user is not None:
+#         login(request, user)
+#         return Response(serializer.initial_data, {"Token" : token.key}, status=status.HTTP_201_CREATED)
+#     else:
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# def logout_view(request):                                                            # 로그아웃
+#     logout(request)
+#     return redirect('getUsers')
+
+class SignupAPIView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
 
-@api_view(['POST'])                                                                  # 로그인
-def login_view(request): 
-    serializer = UserSerializer(data=request.data)
-    username = serializer.initial_data['username']
-    password = serializer.initial_data['password']
-    user = authenticate(request=request, username=username, password=password)
-    if user is not None:
-        login(request, user)
-        return Response(serializer.initial_data, status=status.HTTP_201_CREATED)
-    else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class LoginAPIView(APIView):
+    def post(self, request):
+        user = User.objects.filter(username=request.data['username']).first()
+        if not user:
+            raise APIException('Invalid credentials!')
+        if not user.check_password(request.data['password']):
+            raise APIException('Invalid credentials!')
 
-def logout_view(request):                                                            # 로그아웃
-    logout(request)
-    return redirect('getUsers')
+        access_token = create_access_token(user.id)
+        refresh_token = create_refresh_token(user.id)
+
+        response = Response()
+        response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
+        response.data = {
+            'token' : access_token
+        }
+
+        return response
+
+class UserAPIView(APIView):
+    def get(self, request):
+        auth = get_authorization_header(request).split()
+
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+
+            user = User.objects.filter(pk=id).first()
+            return Response(UserSerializer(user).data)
+        
+        raise AuthenticationFailed('unauthenticated')
+
+class RefreshAPIView(APIView):
+    def post(self, request):
+        refresh_token = request.COOKIES.get('refreshToken')
+        id = decode_refresh_token(refresh_token)
+        access_token = create_access_token(id)
+        return Response({
+            'token': access_token
+        })
+
+class LogoutAPIView(APIView):
+    def post(self, _):
+        response = Response()
+        response.delete_cookie(key="refreshToken")
+        response.data = {
+            'message': 'success'
+        }
+
+        return response

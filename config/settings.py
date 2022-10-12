@@ -46,8 +46,13 @@ INSTALLED_APPS = [
     'user.apps.UserConfig',
     'community.apps.CommunityConfig',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'rest_framework.authtoken'
 ]
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'core.exceptions.status_code_handler'
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -93,7 +98,9 @@ DATABASES = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = True
+CORS_ORIGIN_WHITELIST = (
+    ['https://localhost:3000', 'https://localhost:8000', 'https://hobbydiscovery.herokuapp.com']
+)
 
 # [
 #     'https://hobbydiscovery.herokuapp.com',
