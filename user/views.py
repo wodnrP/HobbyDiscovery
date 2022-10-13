@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -5,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.authentication import get_authorization_header
-from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token
+from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token, access_token_exp
 from .serializer import UserSerializer
 from .models import User
 
@@ -57,31 +58,60 @@ def userDetail(request, user_id):
 #     logout(request)
 #     return redirect('getUsers')
 
+class MyNotFoundException(APIException):
+    status_code = 400
+    default_detail = '로그인 실패 다시 확인해주세요'
+    default_code = 'KeyNotFound'
+
 class SignupAPIView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+        
+            user = User.objects.filter(username=request.data['username']).first()
+            if not user:
+                raise MyNotFoundException()
+            if not user.check_password(request.data['password']):
+                raise MyNotFoundException()
+
+            access_token = create_access_token(user.id)
+            access_exp = access_token_exp(access_token)             
+            refresh_token = create_refresh_token(user.id)
+            serializer_data = serializer.data
+
+            response = Response()
+            response.data = {
+                'serializer_data' : serializer_data,
+                'access_token' : access_token,              
+                'access_exp' : access_exp,                  
+                'refresh_token' : refresh_token         
+            }
+            return response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginAPIView(APIView):
     def post(self, request):
         user = User.objects.filter(username=request.data['username']).first()
+        
         if not user:
-            raise APIException('Invalid credentials!')
+            raise MyNotFoundException()
         if not user.check_password(request.data['password']):
-            raise APIException('Invalid credentials!')
+            raise MyNotFoundException()
 
         access_token = create_access_token(user.id)
+        access_exp = access_token_exp(access_token)     # 생성된 access token의 decode된 만료기간 생성
         refresh_token = create_refresh_token(user.id)
 
         response = Response()
         response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
         response.data = {
-            'token' : access_token
-        }
-
+            'access_token' : access_token,              # access token 반환
+            'access_exp' : access_exp,                  # access 만료기간 반환
+            'refresh_token' : refresh_token             # refresh token 반환
+            }
         return response
+
 
 class UserAPIView(APIView):
     def get(self, request):
@@ -114,3 +144,4 @@ class LogoutAPIView(APIView):
         }
 
         return response
+

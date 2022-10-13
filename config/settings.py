@@ -95,12 +95,11 @@ DATABASES = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = True
-
-# [
+# ([
 #     'https://hobbydiscovery.herokuapp.com',
 #     'https://localhost:8000',
 #     'https://localhost:3000'
-# ]
+# ])
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -121,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'core.exceptions.status_code_handler'
+    'EXCEPTION_HANDLER': 'user.exceptions.status_code_handler'
 }
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
