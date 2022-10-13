@@ -2,8 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-from community import serializer
 from .serializer import HobbySerializer, ReviewSerializer
 from .models import Hobby, review
 
@@ -13,7 +11,7 @@ from .models import Hobby, review
 @api_view(['GET'])
 def viewsGetHobby(request):
     hobby = Hobby.objects.all()
-    serializer = HobbySerializer(hobby, many = True)
+    serializer = HobbySerializer(hobby, many = True, context={"request": request})
     return Response(serializer.data)
 
 # Hobby Get 단일 게시글 데이터 받아오기
