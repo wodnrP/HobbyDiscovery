@@ -4,14 +4,17 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 
+def image_upload_path(instance, filename):
+    return f'{instance.hobby_id.id}/{filename}' 
+
 # 취미 Model
 class Hobby(models.Model):
     hobby_title = models.CharField(max_length=50)                                                                   # 취미 이름
     descrition = models.TextField()                                                                                 # 취미 설명 내용
-    hobby_image = models.ImageField(blank=True)                                                                     # 취미관련 이미지
+    hobby_image = models.ImageField(blank=True, upload_to = image_upload_path)                                                                     # 취미관련 이미지
     
     def __str__(self):
-        return self.hobby_title                                                                     
+        return self.hobby_title                                                                    
 
 # 후기 모음집 Model
 class review(models.Model):

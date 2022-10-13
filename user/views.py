@@ -78,11 +78,11 @@ class SignupAPIView(APIView):
             access_token = create_access_token(user.id)
             access_exp = access_token_exp(access_token)             
             refresh_token = create_refresh_token(user.id)
-            serializer_data = serializer.data
+            #serializer_data = serializer.data
 
             response = Response()
             response.data = {
-                'serializer_data' : serializer_data,
+                #'serializer_data' : serializer_data,
                 'access_token' : access_token,              
                 'access_exp' : access_exp,                  
                 'refresh_token' : refresh_token         
