@@ -63,6 +63,11 @@ class MyNotFoundException(APIException):
     default_detail = '로그인 실패 다시 확인해주세요'
     default_code = 'KeyNotFound'
 
+class SignupException(APIException):
+    status_code = 400
+    default_detail = '아이디 혹은 패스워드를 다시 확인해주세요'
+    default_code = 'KeynotFound'
+
 class SignupAPIView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -71,9 +76,9 @@ class SignupAPIView(APIView):
         
             user = User.objects.filter(username=request.data['username']).first()
             if not user:
-                raise MyNotFoundException()
+                raise SignupException()
             if not user.check_password(request.data['password']):
-                raise MyNotFoundException()
+                raise SignupException()
 
             access_token = create_access_token(user.id)
             access_exp = access_token_exp(access_token)             
@@ -88,7 +93,6 @@ class SignupAPIView(APIView):
                 'refresh_token' : refresh_token         
             }
             return response
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginAPIView(APIView):
     def post(self, request):

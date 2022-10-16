@@ -8,7 +8,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Hobby(models.Model):
     hobby_title = models.CharField(max_length=50)                                                                   # 취미 이름
     descrition = models.TextField()                                                                                 # 취미 설명 내용
-    hobby_image = models.ImageField(blank=True)                                                                     # 취미관련 이미지
+    hobby_image = models.ImageField(blank=True, upload_to="")                                                                     # 취미관련 이미지
     
     def __str__(self):
         return self.hobby_title                                                                    
