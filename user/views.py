@@ -86,6 +86,7 @@ class SignupAPIView(APIView):
             #serializer_data = serializer.data
 
             response = Response()
+            response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
             response.data = {
                 #'serializer_data' : serializer_data,
                 'access_token' : access_token,              
