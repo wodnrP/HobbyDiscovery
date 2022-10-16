@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -107,7 +106,11 @@ class LoginAPIView(APIView):
         access_token = create_access_token(user.id)
         access_exp = access_token_exp(access_token)     # 생성된 access token의 decode된 만료기간 생성
         refresh_token = create_refresh_token(user.id)
-
+        ref_token = decode_refresh_token(refresh_token)
+        print(refresh_token)
+        print(type(refresh_token))
+        print("2",ref_token)
+        print("2",type(ref_token))
         response = Response()
         response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
         response.data = {
@@ -121,7 +124,6 @@ class LoginAPIView(APIView):
 class UserAPIView(APIView):
     def get(self, request):
         auth = get_authorization_header(request).split()
-
         if auth and len(auth) == 2:
             token = auth[1].decode('utf-8')
             id = decode_access_token(token)
@@ -131,14 +133,22 @@ class UserAPIView(APIView):
         
         raise AuthenticationFailed('unauthenticated')
 
+
 class RefreshAPIView(APIView):
     def post(self, request):
-        refresh_token = request.COOKIES.get('refreshToken')
-        id = decode_refresh_token(refresh_token)
+        token = request.data['refresh_token']
+        print(token)
+        
+        byt_token = bytes(token, 'utf-8')
+        print(byt_token)
+        print(type(byt_token))
+
+        id = decode_refresh_token(byt_token)
         access_token = create_access_token(id)
         return Response({
-            'token': access_token
+            'access_token': access_token
         })
+
 
 class LogoutAPIView(APIView):
     def post(self, _):
