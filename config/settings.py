@@ -100,6 +100,7 @@ CORS_ORIGIN_WHITELIST = True
 #     'https://localhost:8000',
 #     'https://localhost:3000'
 # ])
+CORS_ALLOW_CREDENTIALS = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
