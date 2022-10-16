@@ -27,7 +27,7 @@ import os
 
 # SECURITY WARNING: don't run with debug turned on in production!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '6!ijk(i_$b=(uuy@mvd178)3jon*a8p8kl%w^c@w%-)+j#w50g')
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -94,11 +94,12 @@ DATABASES = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = ([
-    'https://hobbydiscovery.herokuapp.com',
-    'https://localhost:8000',
-    'https://localhost:3000'
-])
+CORS_ORIGIN_WHITELIST = True
+# ([
+#     'https://hobbydiscovery.herokuapp.com',
+#     'https://localhost:8000',
+#     'https://localhost:3000'
+# ])
 CORS_ALLOW_CREDENTIALS = True
 
 # Password validation
