@@ -14,7 +14,7 @@ class HobbySerializer(serializers.ModelSerializer):
 
     def get_images(self, obj):
         image = obj.image.all() 
-        return HobbyImageSerializer(instance=image, many=True, context=self.context).data
+        return HobbyImageSerializer(image, many=True, context=self.context).data
 
     class Meta:
         model = Hobby
@@ -24,7 +24,7 @@ class HobbySerializer(serializers.ModelSerializer):
         instance = Hobby.objects.create(**validated_data)
         image_set = self.context['request'].FILES
         for image_data in image_set.getlist('image'):
-            HobbyImage.objects.create(post=instance, image=image_data)
+            HobbyImage.objects.create(hobby=instance, image=image_data)
         return instance
 
 

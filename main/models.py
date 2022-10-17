@@ -19,7 +19,7 @@ def image_upload_path(instance, filename):
 class HobbyImage(models.Model):
     id = models.AutoField(primary_key=True)
     hobby = models.ForeignKey(Hobby, on_delete=models.CASCADE, related_name='image')
-    image = models.ImageField(upload_to=image_upload_path, blank=True)
+    image = models.ImageField(upload_to=image_upload_path)
     def __str__(self):
         return self.hobby.hobby_title
 
