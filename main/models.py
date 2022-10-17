@@ -14,6 +14,7 @@ class Hobby(models.Model):
 
 # 취미 image 업로드 경로
 def image_upload_path(instance, filename):
+    print('success')
     return f'{instance.hobby.id}/{filename}'
 
 class HobbyImage(models.Model):
