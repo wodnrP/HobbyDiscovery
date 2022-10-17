@@ -12,14 +12,14 @@ from .models import Hobby, review
 def viewsGetHobby(request):
     hobby = Hobby.objects.all()
     serializer = HobbySerializer(hobby, many = True, context={"request": request})
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Hobby Get 단일 게시글 데이터 받아오기
 @api_view(['GET'])
 def getHobby(request, hobby_id):
     hobby = Hobby.objects.get(pk = hobby_id)
     serializer = HobbySerializer(hobby, context={"request": request})
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # review CRUD
 # 전체 review 데이터 불러오기 
