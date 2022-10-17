@@ -7,11 +7,24 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # 취미 Model
 class Hobby(models.Model):
     hobby_title = models.CharField(max_length=50)                                                                   # 취미 이름
-    descrition = models.TextField()                                                                                 # 취미 설명 내용
-    hobby_image = models.ImageField(blank=True, upload_to="")                                                                     # 취미관련 이미지
+    descrition = models.TextField()                                                                                 # 취미 설명 내용                                                                   # 취미관련 이미지
     
     def __str__(self):
-        return self.hobby_title                                                                    
+        return self.hobby_title            
+
+# 취미 image 업로드 경로
+def image_upload_path(instance, filename):
+    return f'{instance.hobby.id}/{filename}'
+
+class HobbyImage(models.Model):
+    id = models.AutoField(primary_key=True)
+    hobby = models.ForeignKey(Hobby, on_delete=models.CASCADE, related_name='image')
+    image = models.ImageField(upload_to=image_upload_path, blank=True)
+    def __str__(self):
+        return self.hobby.hobby_title
+
+    class Meta:
+        db_table = 'hobby_image'                                                       
 
 # 후기 모음집 Model
 class review(models.Model):
