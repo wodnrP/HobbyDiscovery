@@ -10,3 +10,5 @@ urlpatterns = [
     path('<hobby_id>/review/<review_id>', views.reviewDetail, name="review_RUD"),
     path('<hobby_id>/review', views.create_review, name="create_review"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

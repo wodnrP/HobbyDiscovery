@@ -24,7 +24,7 @@ class HobbySerializer(serializers.ModelSerializer):
         instance = Hobby.objects.create(**validated_data)
         image_set = self.context['request'].FILES
         for image_data in image_set.getlist('image'):
-            HobbyImage.objects.create(hobby=instance, image=image_data)
+            HobbyImage.objects.create(id=instance, image=image_data)
         return instance
 
 
