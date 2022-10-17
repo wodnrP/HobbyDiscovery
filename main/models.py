@@ -15,7 +15,7 @@ class Hobby(models.Model):
 # 취미 image 업로드 경로
 def image_upload_path(instance, filename):
     print('success')
-    return f'{instance.hobby.id}/{filename}'
+    return f'{instance}/{filename}'
 
 class HobbyImage(models.Model):
     id = models.AutoField(primary_key=True)
