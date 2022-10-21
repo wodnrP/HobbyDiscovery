@@ -1,3 +1,4 @@
+from hashlib import algorithms_available
 import jwt, datetime
 from dateutil.relativedelta import relativedelta
 from rest_framework import exceptions
@@ -11,13 +12,13 @@ def create_access_token(id):
     },  'access_secret', algorithm='HS256')
 
 def access_token_exp(token):
-    payload = jwt.decode(token, 'access_secret', algorithms='HS256')
+    payload = jwt.decode(token, 'access_secret', algorithm ='HS256')
     return payload['exp']
     
 
 def decode_access_token(token):
     try:
-        payload = jwt.decode(token, 'access_secret', algorithms='HS256')
+        payload = jwt.decode(token, 'access_secret', algorithm ='HS256')
         return payload['user_id']
     except:
         raise exceptions.AuthenticationFailed('unauthenticated')
@@ -31,7 +32,7 @@ def create_refresh_token(id):
 
 def decode_refresh_token(token):
     try:
-        payload = jwt.decode(token, 'refresh_secret', algorithms='HS256')
+        payload = jwt.decode(token, 'refresh_secret', algorithm='HS256')
         return payload['user_id']
     except:
         raise exceptions.AuthenticationFailed('unauthenticated')

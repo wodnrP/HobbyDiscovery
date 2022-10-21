@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import User
+from .models import Subscription, User
 
 class UserSerializer(serializers.ModelSerializer):
     #password = serializers.CharField(style={'input_type': 'password'})
     class Meta:
         model = User
-        fields = ('id','username', 'password','profile', 'nickname')
+        fields = ('id','username', 'password','profile', 'nickname', 'number', 'address')
 
     def create(self, validated_data):                       # password 해시암호화
         password = validated_data.pop('password', None)
@@ -20,9 +20,18 @@ class UserSerializer(serializers.ModelSerializer):
         # user.save()
         # return user
 
-    def update(self, user, validated_data):
-        user.set_password(validated_data['password'])
-        user.profile = validated_data.get('profile', user.profile)
-        user.nickname = validated_data.get('nickname', user.nickname)
-        user.save()
-        return user
+    # def update(self, user, validated_data):
+    #     user.set_password(validated_data['password'])
+    #     user.profile = validated_data.get('profile', user.profile)
+    #     user.nickname = validated_data.get('nickname', user.nickname)
+    #     user.number = validated_data.get('number', user.number)
+    #     user.address = validated_data.get('address', user.address)
+    #     user.save()
+    #     return user
+
+class SubSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Subscription
+        fields = ('id', 'user_id', 'create_time', 'delete_time')
+        

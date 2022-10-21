@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import is_valid_path
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -7,7 +8,7 @@ from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.authentication import get_authorization_header
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token, access_token_exp
 from .serializer import UserSerializer
-from .models import User
+from .models import User, Subscription
 
 # Create your views here.
 # @api_view(['GET'])                                                                  # 전체 유저 조회
@@ -106,11 +107,7 @@ class LoginAPIView(APIView):
         access_token = create_access_token(user.id)
         access_exp = access_token_exp(access_token)     # 생성된 access token의 decode된 만료기간 생성
         refresh_token = create_refresh_token(user.id)
-        ref_token = decode_refresh_token(refresh_token)
-        print(refresh_token)
-        print(type(refresh_token))
-        print("2",ref_token)
-        print("2",type(ref_token))
+
         response = Response()
         response.set_cookie(key='refreshToken', value=refresh_token, httponly=True)
         response.data = {
@@ -137,11 +134,8 @@ class UserAPIView(APIView):
 class RefreshAPIView(APIView):
     def post(self, request):
         token = request.data['refresh_token']
-        print(token)
         
         byt_token = bytes(token, 'utf-8')
-        print(byt_token)
-        print(type(byt_token))
 
         id = decode_refresh_token(byt_token)
         access_token = create_access_token(id)
@@ -161,4 +155,19 @@ class LogoutAPIView(APIView):
         }
 
         return response
+
+class UserUpdate(APIView):
+    def patch(self, request):
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+            user = User.objects.filter(pk=id).first()
+            serializer = UserSerializer(user, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
