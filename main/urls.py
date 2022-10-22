@@ -13,8 +13,8 @@ urlpatterns = [
     path('<pd_id>', views.getHobby, name="getHobby"),
     path('<hobby_rv>/reviews', views.get_reviews, name="get_reviews"),
     path('<pd_id>/review/<review_id>', views.reviewDetail, name="review_RUD"),
-    path('<hobby_rv>/review', views.create_review, name="create_review"),
-    #path('create/<pd_id>', views.Create_ReviewView.as_view()),
+    #path('<pd_id>/review', views.create_review, name="create_review"),
+    path('<pd_id>/review', views.CreateReview.as_view()),
     path('', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

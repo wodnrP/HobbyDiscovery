@@ -55,18 +55,18 @@ def  reviewDetail(request, review_id, pd_id):
         return Response({'message':'sucess', 'code' : 200})
 
 #리뷰 작성 기능 
-@api_view(['POST'])
-def create_review(request, hobby_rv):
-    review = get_object_or_404(Hobby, pk = hobby_rv)
-    print(review)
-    serializer = ReviewSerializer(data=request.data)
-    print('s',serializer)
-    if serializer.is_valid(raise_exception=True):
-        serializer.save(hobby_rv = review)
-        print(2)
-        print(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CreateReview(APIView):
+    def post(request, *data, **pd_id):
+        review = get_object_or_404(Hobby, pk = pd_id).filter
+        print(review)
+        serializer = ReviewSerializer(data=request.data)
+        print('s',serializer)
+        if serializer.is_valid():
+            serializer.save(pd_id = review)
+            print(2)
+            print(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class reviewViewSet(ModelViewSet):
     queryset = Hobby.objects.all()
