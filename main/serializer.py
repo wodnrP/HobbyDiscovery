@@ -48,16 +48,16 @@ class ReviewSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Review
-        fields = ('id','title', 'body', 'grade', 'user', 'create_time', 'update_time', 'images')
+        fields = ('id', 'hobby_rv', 'title', 'body', 'grade', 'user', 'create_time', 'update_time', 'images')
         read_only_fields= ['hobby_rv',]
 
-    # def create(self, validated_data):
-    #     instance = Review.objects.create(**validated_data)
-    #     print(instance)
-    #     image_set = self.context['request'].FILES
-    #     print(3)
-    #     for image_data in image_set.getlist('image'):
-    #         Review_Image.objects.create(id=instance, image=image_data)
-    #     return instance
+    def create(self, validated_data):
+        instance = Review.objects.create(**validated_data)
+        print(instance)
+        image_set = self.request.FILES.get('image')
+        print(3)
+        for image_data in image_set.getlist('image'):
+            Review_Image.objects.create(id=instance, image=image_data)
+        return instance
 
 

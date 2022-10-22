@@ -28,10 +28,11 @@ def getHobby(request, pd_id):
 # review CRUD
 # 전체 review 데이터 불러오기 
 @api_view(['GET'])
-def get_reviews(request):
-    reviews = Review.objects.all()
+def get_reviews(request, hobby_rv):
+    reviews = Review.objects.filter( hobby_rv = hobby_rv)
+    print(reviews)
     serializer = ReviewSerializer(reviews, many = True, context={"request": request})
-    return Response(serializer.data, status=status.HTTP_200_OK) 
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 # 한개의 리뷰 보기, 수정, 삭제 
 @api_view(['GET', 'PATCH', 'DELETE'])
@@ -60,16 +61,20 @@ def create_review(request, hobby_rv):
     print(review)
     serializer = ReviewSerializer(data=request.data)
     print('s',serializer)
-    if serializer.is_valid():
+    if serializer.is_valid(raise_exception=True):
         serializer.save(hobby_rv = review)
         print(2)
         print(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# class reviewViewSet(ModelViewSet):
-#     queryset = Hobby.objects.all()
-#     serializer_class = ReviewSerializer
+class reviewViewSet(ModelViewSet):
+    queryset = Hobby.objects.all()
+    serializer_class = ReviewSerializer
+
+    def pre_save(self, obj):
+        print(1)
+        obj.samplesheet = self.request.FILES.get('image')
     
 #     def create(self, request, pd_id):
 #         reviews = Hobby.objects.get(pk=pd_id)

@@ -38,10 +38,10 @@ class Review(models.Model):
     title = models.CharField(max_length=200)                                                                        # 후기 제목
     body = models.TextField()                                                                                       # 후기 내용
     create_time = models.DateTimeField(auto_now_add=True) 
-    update_time = models.DateTimeField(null=True)                                                          # 후기가 작성된 날짜 및 시간
+    update_time = models.DateTimeField(null=True, auto_now=True)                                                          # 후기가 작성된 날짜 및 시간
     grade = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])         # 후기 평점 최소 0, 최대 5까지 값 받도록 지정
     user = models.ForeignKey("user.User", related_name="reviewer", on_delete=models.CASCADE, db_column="user")      # 후기를 작성한 유저(외래키)
-    hobby_rv = models.ForeignKey("Hobby", related_name="hobby_rv", on_delete=models.CASCADE, db_column="hobby_rv")      # 해당 취미 (외래키)
+    hobby_rv = models.ForeignKey("Hobby", related_name="hobby_rv", on_delete=models.CASCADE, db_column="hobby_rv", blank=True, null=False)      # 해당 취미 (외래키)
     def __str__(self):
         return self.hobby_rv.pd_title
 
