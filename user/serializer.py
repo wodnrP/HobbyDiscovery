@@ -1,3 +1,4 @@
+from django.urls import is_valid_path
 from rest_framework import serializers
 from .models import Subscription, User
 
@@ -20,14 +21,14 @@ class UserSerializer(serializers.ModelSerializer):
         # user.save()
         # return user
 
-    # def update(self, user, validated_data):
-    #     user.set_password(validated_data['password'])
-    #     user.profile = validated_data.get('profile', user.profile)
-    #     user.nickname = validated_data.get('nickname', user.nickname)
-    #     user.number = validated_data.get('number', user.number)
-    #     user.address = validated_data.get('address', user.address)
-    #     user.save()
-    #     return user
+    def update(self, user, validated_data):
+        user.set_password(validated_data['password'])
+        user.profile = validated_data.get('profile', user.profile)
+        user.nickname = validated_data.get('nickname', user.nickname)
+        user.number = validated_data.get('number', user.number)
+        user.address = validated_data.get('address', user.address)
+        user.save()
+        return user
 
 class SubSerializer(serializers.ModelSerializer):
 
@@ -35,3 +36,5 @@ class SubSerializer(serializers.ModelSerializer):
         model = Subscription
         fields = ('id', 'user_id', 'create_time', 'delete_time')
         
+
+#use_natural_foreign_key=True
