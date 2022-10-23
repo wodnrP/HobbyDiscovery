@@ -10,9 +10,9 @@ class HobbyImageSerializer(serializers.ModelSerializer):
 
 class HobbySerializer(serializers.ModelSerializer):
     #hobby_image = serializers.ImageField(use_url=True)
-    images = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField() 
     #review_set = ReviewSerializer(many=True, read_only=True)
-    review_count = serializers.IntegerField(source='')
+    # review_count = serializers.IntegerField(source='')
     def get_images(self, obj):
         image = obj.image.all() 
         return HobbyImageSerializer(image, many=True, context=self.context).data
