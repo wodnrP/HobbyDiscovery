@@ -1,5 +1,5 @@
 from urllib import response
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.urls import is_valid_path
 from rest_framework import status
 from rest_framework.views import APIView
@@ -55,26 +55,30 @@ def  reviewDetail(request, review_id, pd_id):
         return Response({'message':'sucess', 'code' : 200})
 
 #리뷰 작성 기능 
-class CreateReview(APIView):
-    def post(request, *data, **pd_id):
-        review = get_object_or_404(Hobby, pk = pd_id).filter
-        print(review)
-        serializer = ReviewSerializer(data=request.data)
-        print('s',serializer)
-        if serializer.is_valid():
-            serializer.save(pd_id = review)
-            print(2)
-            print(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class CreateReview(APIView):
+#     def post(self, request):
+#         reviews = Review.objects.filter()
+#         serializer = ReviewSerializer(data=request.data, partial = True)
+#         if serializer.is_valid():
+#             serializer.save(reviews = reviews)
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def review_create(request, pd_id) :
+    hobby_rv = Hobby.objects.get(pk = pd_id)
+    serializer = ReviewSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True) :
+        serializer.save(hobby_rv=hobby_rv,) # 해당 글에 댓글쓰기
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class reviewViewSet(ModelViewSet):
     queryset = Hobby.objects.all()
     serializer_class = ReviewSerializer
 
-    def pre_save(self, obj):
-        print(1)
-        obj.samplesheet = self.request.FILES.get('image')
+    # def pre_save(self, obj):
+    #     print(1)
+    #     obj.samplesheet = self.request.FILES.get('image')
     
 #     def create(self, request, pd_id):
 #         reviews = Hobby.objects.get(pk=pd_id)

@@ -1,4 +1,5 @@
 from django.urls import is_valid_path
+from requests import request
 from rest_framework import serializers
 from .models import Subscription, User
 
@@ -22,7 +23,9 @@ class UserSerializer(serializers.ModelSerializer):
         # return user
 
     def update(self, user, validated_data):
-        user.set_password(validated_data['password'])
+        password = validated_data.get('password', None)
+        if password is not None:
+            user.set_password(validated_data['password'])
         user.profile = validated_data.get('profile', user.profile)
         user.nickname = validated_data.get('nickname', user.nickname)
         user.number = validated_data.get('number', user.number)

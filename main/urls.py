@@ -14,7 +14,8 @@ urlpatterns = [
     path('<hobby_rv>/reviews', views.get_reviews, name="get_reviews"),
     path('<pd_id>/review/<review_id>', views.reviewDetail, name="review_RUD"),
     #path('<pd_id>/review', views.create_review, name="create_review"),
-    path('<pd_id>/review', views.CreateReview.as_view()),
+    #path('review/', views.CreateReview.as_view()),
+    path('<pd_id>/review/', views.review_create, name="review_create"),
     path('', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

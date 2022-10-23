@@ -11,7 +11,8 @@ class HobbyImageSerializer(serializers.ModelSerializer):
 class HobbySerializer(serializers.ModelSerializer):
     #hobby_image = serializers.ImageField(use_url=True)
     images = serializers.SerializerMethodField()
-
+    #review_set = ReviewSerializer(many=True, read_only=True)
+    review_count = serializers.IntegerField(source='')
     def get_images(self, obj):
         image = obj.image.all() 
         return HobbyImageSerializer(image, many=True, context=self.context).data
@@ -51,11 +52,9 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'hobby_rv', 'title', 'body', 'grade', 'user', 'create_time', 'update_time', 'images')
         read_only_fields= ['hobby_rv',]
 
-    def create(self, validated_data):
+    def create(self, instance, **validated_data):
         instance = Review.objects.create(**validated_data)
-        print(instance)
         image_set = self.request.FILES.get('image')
-        print(3)
         for image_data in image_set.getlist('image'):
             Review_Image.objects.create(id=instance, image=image_data)
         return instance
