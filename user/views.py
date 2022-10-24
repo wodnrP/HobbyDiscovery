@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import is_valid_path
+from requests import request
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -17,21 +18,21 @@ from .models import User, Subscription
 #     serializer = UserSerializer(users, many = True)
 #     return Response(serializer.data)
 
-@api_view(['GET', 'PATCH', 'DELETE'])                                               # 단일 회원 조회, 수정, 삭제
-def userDetail(request, user_id): 
-    user = User.objects.get(pk = user_id)
-    if request.method == 'GET':
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-    elif request.method == 'PATCH':
-        serializer = UserSerializer(user, data=request.data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        user.delete()
-        return Response({'message':'sucess', 'code' : 200})
+# @api_view(['GET', 'PATCH', 'DELETE'])                                               # 단일 회원 조회, 수정, 삭제
+# def userDetail(request, user_id): 
+#     user = User.objects.get(pk = user_id)
+#     if request.method == 'GET':
+#         serializer = UserSerializer(user)
+#         return Response(serializer.data)
+#     elif request.method == 'PATCH':
+#         serializer = UserSerializer(user, data=request.data, partial = True)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     elif request.method == 'DELETE':
+#         user.delete()
+#         return Response({'message':'sucess', 'code' : 200})
 
 # @api_view(['POST'])                                                                  # 회원가입
 # def signup_view(request): 
@@ -119,16 +120,31 @@ class LoginAPIView(APIView):
 
 
 class UserAPIView(APIView):
-    def get(self, request):
-        auth = get_authorization_header(request).split()
-        if auth and len(auth) == 2:
-            token = auth[1].decode('utf-8')
-            id = decode_access_token(token)
+    def get(self, request, **kwargs):
+        if kwargs.get('user_id') is None:
+            auth = get_authorization_header(request).split()
+            if auth and len(auth) == 2:
+                token = auth[1].decode('utf-8')
+                id = decode_access_token(token)
 
-            user = User.objects.filter(pk=id).first()
-            return Response(UserSerializer(user).data)
-        
-        raise AuthenticationFailed('unauthenticated')
+                user = User.objects.filter(pk=id).first()
+                return Response(UserSerializer(user).data)
+            
+            raise AuthenticationFailed('unauthenticated')
+        else:
+            user_id = kwargs.get('user_id') 
+            user_serializer = UserSerializer(User.objects.get(pk=user_id))
+            response = Response()
+
+            user_id = user_serializer.data.get('id')
+            nickname = user_serializer.data.get('nickname')
+            profile = user_serializer.data.get('profile')
+            response.data = {
+                'id' : user_id,
+                'nickname' : nickname,
+                'profile' :profile
+            }
+            return response
 
 
 class RefreshAPIView(APIView):
@@ -144,6 +160,7 @@ class RefreshAPIView(APIView):
             'access_token': access_token,
             'access_exp': access_exp
         })
+    
 
 
 class LogoutAPIView(APIView):
@@ -170,4 +187,6 @@ class UserUpdate(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
