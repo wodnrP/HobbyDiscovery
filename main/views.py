@@ -1,3 +1,5 @@
+from itertools import count
+from typing import Counter
 from urllib import response
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.urls import is_valid_path
@@ -8,15 +10,33 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from .serializer import HobbySerializer, ReviewSerializer
 from .models import Hobby, Review
+from rest_framework.pagination import PageNumberPagination
+from django.db.models import Count
+
 
 # Create your views here.
 # Hobby CRUD
-# Hobby Gets 전체 게시글 데이터 받아오기
-@api_view(['GET'])
-def viewsGetHobby(request):
-    hobby = Hobby.objects.all()
-    serializer = HobbySerializer(hobby, many = True, context={"request": request})
-    return Response(serializer.data, status=status.HTTP_200_OK)
+# Hobby Gets 전체 게시글 데이터 받아오기 pagenation - 10,최신순, 갯수, 랜덤(가격)
+class GetHobby(APIView):
+    def get(self, request):
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        order_condition = request.GET.get('order', None)
+
+        if order_condition == 'pd_create':
+            hobby = Hobby.objects.order_by('pd_create')
+            result = paginator.paginate_queryset(hobby, request)
+
+        elif order_condition == 'pd_price':
+            hobby = Hobby.objects.order_by('pd_price')
+            result = paginator.paginate_queryset(hobby, request)
+        
+        elif order_condition == 'review_count':
+            hobby = Hobby.objects.annotate(review_count=Count('hobby_rv')).order_by('-review_count')
+            result = paginator.paginate_queryset(hobby, request)
+        
+        serializer = HobbySerializer(result, many = True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Hobby Get 단일 게시글 데이터 받아오기
 @api_view(['GET'])

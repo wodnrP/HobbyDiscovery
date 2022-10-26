@@ -95,7 +95,7 @@ DATABASES = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = True 
+CORS_ORIGIN_WHITELIST = True
 # ([
 #     'https://hobbydiscovery.herokuapp.com',
 #     'https://localhost:8000',
@@ -122,7 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 REST_FRAMEWORK = {
-    'EXCEPTION_HANDLER': 'user.exceptions.status_code_handler'
+    'EXCEPTION_HANDLER': 'user.exceptions.status_code_handler',
+    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10,
 }
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
