@@ -23,8 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         # return user
 
     def update(self, user, validated_data):
-        password = validated_data.get('password', None)
-        if password is not None:
+        if user.password != self.validated_data['password']:
             user.set_password(validated_data['password'])
         user.profile = validated_data.get('profile', user.profile)
         user.nickname = validated_data.get('nickname', user.nickname)
