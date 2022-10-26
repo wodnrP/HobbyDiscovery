@@ -159,7 +159,6 @@ class UserAPIView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 class RefreshAPIView(APIView):
@@ -175,6 +174,7 @@ class RefreshAPIView(APIView):
             'access_token': access_token,
             'access_exp': access_exp
         })
+    
 
 
 class LogoutAPIView(APIView):
@@ -201,4 +201,6 @@ class LogoutAPIView(APIView):
 #                 return Response(serializer.data, status=status.HTTP_200_OK)
 #             else:
 #                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
