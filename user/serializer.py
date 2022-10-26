@@ -1,7 +1,7 @@
 from django.urls import is_valid_path
 from requests import request
 from rest_framework import serializers
-from .models import Subscription, User
+from .models import Subscription, User, Sub_pd
 
 class UserSerializer(serializers.ModelSerializer):
     #password = serializers.CharField(style={'input_type': 'password'})
@@ -37,7 +37,15 @@ class SubSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ('id', 'user_id', 'create_time', 'delete_time')
+        fields = ('id', 'user_id', 'create_time', 'delete_time', 'subpd_id')
+
+
+
+class Sub_pdSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Sub_pd
+        fields = ('id', 'title', 'body', 'price', 'sub_image')
         
 
 #use_natural_foreign_key=True

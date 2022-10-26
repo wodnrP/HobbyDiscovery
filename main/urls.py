@@ -11,12 +11,12 @@ router.register(r'create', views.reviewViewSet)
 
 urlpatterns = [
     path('hobby', GetHobby.as_view(), name="viewsGetHobby"),
-    path('<pd_id>', views.getHobby, name="getHobby"),
-    path('<hobby_rv>/reviews', views.get_reviews, name="get_reviews"),
-    path('<pd_id>/review/<review_id>', views.reviewDetail, name="review_RUD"),
+    path('<int:pd_id>', views.getHobby, name="getHobby"),
+    path('<int:hobby_rv>/reviews', views.get_reviews, name="get_reviews"),
+    path('<int:pd_id>/review/<int:review_id>', views.reviewDetail, name="review_RUD"),
     #path('<pd_id>/review', views.create_review, name="create_review"),
     #path('review/', views.CreateReview.as_view()),
-    path('<pd_id>/review/', views.review_create, name="review_create"), 
+    path('<int:pd_id>/review', views.review_create, name="review_create"), 
     path('', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

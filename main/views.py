@@ -1,6 +1,3 @@
-from itertools import count
-from typing import Counter
-from urllib import response
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.urls import is_valid_path
 from rest_framework import status

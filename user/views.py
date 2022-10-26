@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect
 from django.urls import is_valid_path
-from requests import request
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,8 +7,10 @@ from rest_framework.views import APIView
 from rest_framework.exceptions import APIException, AuthenticationFailed
 from rest_framework.authentication import get_authorization_header
 from .authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token, access_token_exp
-from .serializer import UserSerializer
-from .models import User, Subscription
+from .serializer import UserSerializer, SubSerializer, Sub_pdSerializer
+from .models import User, Subscription, Sub_pd
+from datetime import datetime
+from django.utils import timezone
 
 # Create your views here.
 # @api_view(['GET'])                                                                  # 전체 유저 조회
@@ -187,20 +188,90 @@ class LogoutAPIView(APIView):
 
         return response
 
-# class UserUpdate(APIView):
-#     def patch(self, request):
+class SubscriptionAPIView(APIView):
+    def get(self, request):
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+            subscription = Subscription.objects.filter(pk=id).first()
+            serializer = SubSerializer(subscription, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request):
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+            data = {
+                "user_id": id, "subpd_id": request.data["subpd_id"]
+            }
+            serializer = SubSerializer(data=data)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request):
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+            subscription = Subscription.objects.filter(user_id=id).last()
+    
+            date = timezone.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            data = {
+                "delete_time" : date
+            }
+            
+            serializer = SubSerializer(subscription, data=data, partial=True)
+            
+            if serializer.is_valid() :
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class SubAPIView(APIView):
+#     def get(self, request):
 #         auth = get_authorization_header(request).split()
 #         if auth and len(auth) == 2:
 #             token = auth[1].decode('utf-8')
 #             id = decode_access_token(token)
-#             user = User.objects.filter(pk=id).first()
-#             serializer = UserSerializer(user, data=request.data, partial=True)
+#             subscription = Subscription.objects.filter(pk=id).first()
+#             serializer = SubSerializer(subscription, data=request.data, partial=True)
 
 #             if serializer.is_valid():
 #                 serializer.save()
 #                 return Response(serializer.data, status=status.HTTP_200_OK)
 #             else:
 #                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def post(self, request):
+    #     serializer = SubSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def patch(self, request):
+        #user_id = kwargs.get('user_id')
+        #subscription = Subscription.objects.filter(pk=1).first()
+        # serializer = SubSerializer(subscription, data=request.data, partial = True)
+        # print(serializer)
+        # date = datetime.now()
+        # serializer['delete_time'].save(date)
+        # if serializer.is_valid() and serializer['delete_time'] is None:
+        #     serializer.save()
+        #     return Response(serializer.data, status=status.HTTP_200_OK)
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
