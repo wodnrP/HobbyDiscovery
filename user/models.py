@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.forms import ImageField
 
 # Create your models here.
 class User(AbstractUser):
@@ -12,4 +13,11 @@ class Subscription(models.Model):
     user_id = models.ForeignKey(User, related_name="user_sub", on_delete=models.CASCADE, db_column="user_id")
     create_time = models.DateTimeField(auto_now_add=True)
     delete_time = models.DateTimeField()
+    subpd_id = models.ForeignKey("Sub_pd", related_name="sub_product", on_delete=models.CASCADE, db_column="subpd_id", null=True)
+
+class Sub_pd(models.Model):
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    price = models.IntegerField()
+    sub_image = models.ImageField()
 

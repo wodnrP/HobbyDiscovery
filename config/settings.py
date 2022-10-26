@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main.apps.MainConfig',
     'user.apps.UserConfig',
+    'order.apps.OrderConfig',
     'community.apps.CommunityConfig',
     'rest_framework',
     'corsheaders',
@@ -124,7 +125,6 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'user.exceptions.status_code_handler',
     'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10,
 }
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

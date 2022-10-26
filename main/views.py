@@ -20,7 +20,7 @@ from django.db.models import Count
 class GetHobby(APIView):
     def get(self, request):
         paginator = PageNumberPagination()
-        paginator.page_size = 10
+        paginator.page_size = request.query_params['items']
         order_condition = request.GET.get('order', None)
 
         if order_condition == 'pd_create':
