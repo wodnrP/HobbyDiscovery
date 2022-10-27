@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_list_or_404
 from django.urls import is_valid_path
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -239,14 +239,15 @@ class SubscriptionAPIView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Sub_pdAPIView(APIView):
-    def get(self, request):
-        sub_pd = Sub_pd.objects.get()
-        serializer = Sub_pdSerializer(sub_pd, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
+    def get(self,request):
+        sub_pd = Sub_pd.objects.all()
+        serializer = Sub_pdSerializer(sub_pd, many=True)
+        
+        if sub_pd:
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 # class SubAPIView(APIView):
 #     def get(self, request):
