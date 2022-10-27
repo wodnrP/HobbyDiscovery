@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import SignupAPIView, LoginAPIView, UserAPIView, RefreshAPIView, LogoutAPIView, SubscriptionAPIView
+from .views import SignupAPIView, LoginAPIView, UserAPIView, RefreshAPIView, LogoutAPIView, SubscriptionAPIView, Sub_pdAPIView
 urlpatterns = [
     # path('', views.getUsers, name="getUsers"),
     # path('signup', views.signup_view, name='signup'),
@@ -14,5 +14,6 @@ urlpatterns = [
     path('logout', LogoutAPIView.as_view()),
     #path('sub/', SubAPIView.as_view()),
     path('sub', SubscriptionAPIView.as_view()),
+    path('sub_pd', Sub_pdAPIView.as_view()),
     #path('update', UserUpdate.as_view()),
 ]

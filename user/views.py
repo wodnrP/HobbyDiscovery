@@ -238,6 +238,16 @@ class SubscriptionAPIView(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Sub_pdAPIView(APIView):
+    def get(self, request):
+        sub_pd = Sub_pd.objects.get()
+        serializer = Sub_pdSerializer(sub_pd, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 # class SubAPIView(APIView):
 #     def get(self, request):
 #         auth = get_authorization_header(request).split()

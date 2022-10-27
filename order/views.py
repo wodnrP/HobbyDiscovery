@@ -60,3 +60,38 @@ class OrderAPIView(APIView):
         
         else:
             return Response({'message' : "no auth token"})
+
+class Order_detailAPIView(APIView):
+    def get(self, request):
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+            order = Order.objects.filter(o_user=id)
+            order_serializer = OrderSerializer(order, many=True, context={"request": request})
+            order_serializer = order_serializer.data
+            #print(order_serializer)
+
+            order_id = order_serializer[0]["id"]
+            #print(order_id)
+            #print(type(order_id))
+            oder_pd = Order_detail.objects.filter(od_id=order_id)
+            #print(oder_pd)
+            detail_serializer = Order_detailSerializer(oder_pd, many=True, context={"request": request})
+            detail_serializer = detail_serializer.data
+            print(detail_serializer)
+
+            num = 0
+            for i in detail_serializer:
+                
+                # print(1,i)
+                # print(type(i))
+                # i = len(detail_serializer)
+                print(num)
+                print(oder_pd[num].od_pd)
+                num =+ 1
+                oder_pd_id = detail_serializer[0].od_pd
+
+            print(oder_pd_id)
+
+            
