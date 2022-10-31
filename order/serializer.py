@@ -6,7 +6,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'o_user', 'o_add', 'o_num', 'o_name', 'o_pay', 'o_total_price')
+        fields = ('id', 'o_user', 'o_add', 'o_num', 'o_name', 'o_pay', 'o_total_price', 'o_create')
 
     # def get_od_pd(self, obj):
     #     od_pd = obj.od_hobby.all()                                                  # obj.(review fk:related name).all()

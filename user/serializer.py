@@ -37,7 +37,7 @@ class SubSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ('id', 'user_id', 'create_time', 'delete_time', 'subpd_id')
+        fields = ('id', 'user_id', 'create_time', 'delete_time', 'subpd_id', 'order_id')
 
 
 

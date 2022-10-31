@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.forms import ImageField
-
+import order
 # Create your models here.
 class User(AbstractUser):
     profile = models.ImageField(null=True, blank=True)                         # 유저 프로필 이미지
@@ -14,6 +14,7 @@ class Subscription(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     delete_time = models.DateTimeField(null=True)
     subpd_id = models.ForeignKey("Sub_pd", related_name="sub_product", on_delete=models.CASCADE, db_column="subpd_id", null=True)
+    order_id = models.ForeignKey("order.Order", related_name="sub_order", on_delete=models.CASCADE, db_column="order_id", null=True)
 
 class Sub_pd(models.Model):
     title = models.CharField(max_length=200)
