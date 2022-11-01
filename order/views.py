@@ -107,7 +107,7 @@ class OrderAPIView(APIView):
                     }, status=status.HTTP_200_OK)
 
         else:
-            return Response({'message' : "no auth token"})
+            return Response({'message' : "no auth token, order_condition: " + order_condition})
 
     def post(self, request):
         paginator = PageNumberPagination()
