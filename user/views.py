@@ -154,7 +154,7 @@ class UserAPIView(APIView):
             id = decode_access_token(token)
             user = User.objects.filter(pk=id).first()
             serializer = UserSerializer(user, data=request.data, partial=True)
-
+            
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -223,13 +223,14 @@ class SubscriptionAPIView(APIView):
         if auth and len(auth) == 2:
             token = auth[1].decode('utf-8')
             id = decode_access_token(token)
-            subscription = Subscription.objects.filter(user_id=id).last()
+            subscription = Subscription.objects.filter(id=request.data['sub_id']).first()
+            
     
             date = timezone.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             data = {
                 "delete_time" : date
             }
-            
+
             serializer = SubSerializer(subscription, data=data, partial=True)
             
             if serializer.is_valid() :

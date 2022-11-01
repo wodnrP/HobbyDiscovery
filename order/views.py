@@ -26,7 +26,6 @@ class OrderAPIView(APIView):
             serializer = OrderSerializer(order_obj, many=True, context={"request": request})
             order_data = []
             # 반복할 숫자 선언(num) & 직렬화된 데이터에서 주문id 추출 --> 해당 주문 id의 주문 디테일 id 필터링 & json직렬화 
-            print(serializer.data.count)
             if order_condition == 'item':
                 
                 for order in serializer.data:
@@ -78,13 +77,11 @@ class OrderAPIView(APIView):
                     
                     order_pd = Subscription.objects.filter(order_id=order['id'])
                     sub_serializer = SubSerializer(order_pd, many=True, context={"request": request})
-                    print(sub_serializer.data)
-                    # try:
+                
                     if len(sub_serializer.data) == 0:
                         continue
                     sub_serializer = sub_serializer.data[0]
-                    # except:
-                    #     Response({"message" : "sub_serializer list index out of range!"})
+    
                     subpd = Sub_pd.objects.filter(id=sub_serializer['subpd_id'])
                     subpd_serializer = Sub_pdSerializer(subpd, many=True, context={"request": request})
                     subpd_serializer = subpd_serializer.data[0]
@@ -101,6 +98,7 @@ class OrderAPIView(APIView):
                         "o_items" : sub_order_data
                     }
                     detail_order_data_obj = {
+                        "sub_id" : sub_serializer['id'],
                         "s_id" : subpd_serializer['id'],
                         "s_title" : subpd_serializer['title'],
                         "s_body" : subpd_serializer['body'],
