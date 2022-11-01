@@ -17,19 +17,28 @@ from django.db.models import Count
 class GetHobby(APIView):
     def get(self, request):
         paginator = PageNumberPagination()
-        paginator.page_size = request.query_params['items']
+        paginator.page_size = 12
+        items = request.GET.get('items', None)
+        search = request.GET.get('search', None)
+        if search is None:
+            search = ""
+
+        if items is not None:
+            paginator.page_size = items
+
         order_condition = request.GET.get('order', None)
+        search_filter = Hobby.objects.filter(pd_title__icontains=search)
 
-        if order_condition == 'pd_create':
-            hobby = Hobby.objects.order_by('pd_create')
-            result = paginator.paginate_queryset(hobby, request)
-
-        elif order_condition == 'pd_price':
-            hobby = Hobby.objects.order_by('pd_price')
+        if order_condition == 'pd_price':
+            hobby = search_filter.order_by('pd_price')
             result = paginator.paginate_queryset(hobby, request)
         
         elif order_condition == 'review_count':
-            hobby = Hobby.objects.annotate(review_count=Count('hobby_rv')).order_by('-review_count')
+            hobby = search_filter.annotate(review_count=Count('hobby_rv')).order_by('-review_count')
+            result = paginator.paginate_queryset(hobby, request)
+
+        else:
+            hobby = search_filter.order_by('pd_create')
             result = paginator.paginate_queryset(hobby, request)
         
         serializer = HobbySerializer(result, many = True, context={"request": request})
