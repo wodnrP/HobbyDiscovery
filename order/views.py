@@ -26,12 +26,14 @@ class OrderAPIView(APIView):
             serializer = OrderSerializer(order_obj, many=True, context={"request": request})
             order_data = []
             # 반복할 숫자 선언(num) & 직렬화된 데이터에서 주문id 추출 --> 해당 주문 id의 주문 디테일 id 필터링 & json직렬화 
+            print(serializer.data.count)
             if order_condition == 'item':
+                
                 for order in serializer.data:
-                    
                     order_pd = Order_detail.objects.filter(od_id=order['id'])
                     detail_serializer = Order_detailSerializer(order_pd, many=True, context={"request": request})
                     detail_serializer = detail_serializer.data
+                    
                     detail_order_data = []
                     order_data_obj = {
                         "o_id" : order['id'],
@@ -45,14 +47,15 @@ class OrderAPIView(APIView):
                     }
                     # 반복할 숫자 선언(dict_od_id_num) & 주문 디테일에서 주문한 상품정보 id추출 --> 해당 상품정보 id의 상품 필터링 & json직렬화
                     
-                    for order_pd in detail_serializer:                    
+                    for order_pd in detail_serializer:
+                        
                         order_hobby = Hobby.objects.filter(pd_id=order_pd['od_pd'])
                         hobby_serializer = HobbySerializer(order_hobby, many=True, context={"request": request})
                         hobby_serializer = hobby_serializer.data[0]
-                    
+
                         
                         detail_order_data_obj= {
-                            "p_id" : order_pd["id"],
+                            "p_id" : order_pd["od_pd"],
                             "p_quantity" : order_pd['od_quantity'],
                             "p_total_price" : order_pd['od_price'],
                             "p_title" : hobby_serializer['pd_title'],
@@ -65,18 +68,23 @@ class OrderAPIView(APIView):
                         }
 
                         detail_order_data.append(detail_order_data_obj)
-                    order_data.append(order_data_obj)
+                    if len(detail_serializer) != 0:
+                        order_data.append(order_data_obj)
+                    
             
             elif order_condition == 'sub':
+                
                 for order in serializer.data:
-            
+                    
                     order_pd = Subscription.objects.filter(order_id=order['id'])
                     sub_serializer = SubSerializer(order_pd, many=True, context={"request": request})
-                    try:
-                        sub_serializer = sub_serializer.data[0]
-                    except:
-                        Response({"message" : "no sub_serializer list, " + sub_serializer})
-                    
+                    print(sub_serializer.data)
+                    # try:
+                    if len(sub_serializer.data) == 0:
+                        continue
+                    sub_serializer = sub_serializer.data[0]
+                    # except:
+                    #     Response({"message" : "sub_serializer list index out of range!"})
                     subpd = Sub_pd.objects.filter(id=sub_serializer['subpd_id'])
                     subpd_serializer = Sub_pdSerializer(subpd, many=True, context={"request": request})
                     subpd_serializer = subpd_serializer.data[0]
@@ -103,9 +111,9 @@ class OrderAPIView(APIView):
                     }
                     sub_order_data.append(detail_order_data_obj)
                     order_data.append(order_data_obj)
-
+                
             return Response({
-                    "order" : order_data,
+                        "order" : order_data,
                     }, status=status.HTTP_200_OK)
 
         else:
@@ -153,14 +161,14 @@ class OrderAPIView(APIView):
                 elif order_condition == 'sub':
                     
                     for sub in request.data["items"]:
-                        print(sub["id"])
+                        
                         od_sub_data = {
                             "order_id": current_order_id,
                             "subpd_id": sub["id"],
                             "user_id": id
                         }
                         subSerializer = SubSerializer(data=od_sub_data)
-                        print(subSerializer)
+                        
                         if subSerializer.is_valid():
                             subSerializer.save()
                         else:
