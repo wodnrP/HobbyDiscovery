@@ -9,6 +9,7 @@ from .serializer import HobbySerializer, ReviewSerializer
 from .models import Hobby, Review
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Count
+import math
 
 
 # Create your views here.
@@ -20,14 +21,34 @@ class GetHobby(APIView):
         paginator.page_size = 12
         items = request.GET.get('items', None)
         search = request.GET.get('search', None)
+        page = request.GET.get('page', None)
+
+        if page is None:
+            page = 1
+
         if search is None:
             search = ""
 
         if items is not None:
-            paginator.page_size = items
+            paginator.page_size = int(items)
+        
+        page = int(page)
 
         order_condition = request.GET.get('order', None)
         search_filter = Hobby.objects.filter(pd_title__icontains=search)
+        count = search_filter.count()
+        page_data = count % paginator.page_size 
+
+        if count <= paginator.page_size:
+            total_page = 1
+
+        elif page_data == 0:
+            total_page = count / paginator.page_size
+
+        else:
+            total_page = count / paginator.page_size + 1
+        total_page = math.floor(total_page)
+        is_next = total_page - page > 0
 
         if order_condition == 'pd_price':
             hobby = search_filter.order_by('pd_price')
@@ -42,7 +63,16 @@ class GetHobby(APIView):
             result = paginator.paginate_queryset(hobby, request)
         
         serializer = HobbySerializer(result, many = True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        result_serializer = serializer.data
+        pagenation = {
+            "total_page" : total_page,
+            "current_page" : page,
+            "total_count" : count,
+            "is_next" : is_next,
+            "result" : result_serializer
+        }
+        
+        return Response(pagenation, status=status.HTTP_200_OK)
 
 # Hobby Get 단일 게시글 데이터 받아오기
 @api_view(['GET'])
