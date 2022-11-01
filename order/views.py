@@ -72,8 +72,10 @@ class OrderAPIView(APIView):
             
                     order_pd = Subscription.objects.filter(order_id=order['id'])
                     sub_serializer = SubSerializer(order_pd, many=True, context={"request": request})
-
-                    sub_serializer = sub_serializer.data[0]
+                    try:
+                        sub_serializer = sub_serializer.data[0]
+                    except:
+                        Response({"message" : "no sub_serializer list, " + sub_serializer})
                     
                     subpd = Sub_pd.objects.filter(id=sub_serializer['subpd_id'])
                     subpd_serializer = Sub_pdSerializer(subpd, many=True, context={"request": request})
