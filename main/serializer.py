@@ -1,3 +1,4 @@
+from requests import request
 from rest_framework import serializers
 from .models import Hobby, Review, HobbyImage, Review_Image
 
@@ -6,10 +7,11 @@ class RvImageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Review_Image
-        fields = ['image']
+        fields = ['id', 'reviews','image']
 
 class ReviewSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
+    print(images)
 
     def get_images(self, obj):
         image = obj.rv_image.all()                                                  # obj.(review fk:related name).all()
@@ -18,14 +20,35 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'hobby_rv', 'title', 'body', 'grade', 'user', 'create_time', 'update_time', 'images')
-        read_only_fields= ['hobby_rv',]
+        
 
     def create(self, instance, **validated_data):
-        instance = Review.objects.create(**validated_data)
-        image_set = self.request.FILES.get('image')
+        review_obj = Review.objects.create(title = instance["title"], body= instance["body"], grade= instance["grade"],
+        hobby_rv = instance["hobby_rv"], user= instance["user"])
+        
+        image_set = instance['request'].FILES
         for image_data in image_set.getlist('image'):
-            Review_Image.objects.create(id=instance, image=image_data)
-        return instance
+            Review_Image.objects.create(reviews=review_obj, image=image_data)
+
+        return review_obj
+
+    def update(self, review, validated_data):
+        review.title = validated_data.get('title', review.title)
+        review.body = validated_data.get('body', review.body)
+        review.grade = validated_data.get('grade', review.grade)
+        # Review_Image.images = validated_data.get('image', Review_Image.image)
+        # print(1)
+        # print(review.id)
+        # print()
+        # review_image = Review_Image.objects.filter(reviews=review.id)
+        # image_set = review_image.values_list('image', flat=True)
+        # print(self.get_images)
+        # image_set = self['request'].FILES
+        # for image_data in image_set.getlist('image'):
+        #     Review_Image.objects.update(reviews=review, image=image_data)
+        # review.save()
+        return review
+        
 
 
 class HobbyImageSerializer(serializers.ModelSerializer):

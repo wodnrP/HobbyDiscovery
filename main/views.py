@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .serializer import HobbySerializer, ReviewSerializer
-from .models import Hobby, Review
+from .serializer import HobbySerializer, ReviewSerializer, RvImageSerializer
+from .models import Hobby, Review, Review_Image
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Count
 import math
@@ -86,8 +86,8 @@ def getHobby(request, pd_id):
 @api_view(['GET'])
 def get_reviews(request, hobby_rv):
     reviews = Review.objects.filter( hobby_rv = hobby_rv)
-    print(reviews)
     serializer = ReviewSerializer(reviews, many = True, context={"request": request})
+
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 # 한개의 리뷰 보기, 수정, 삭제 
@@ -111,37 +111,22 @@ def  reviewDetail(request, review_id, pd_id):
         return Response({'message':'sucess', 'code' : 200})
 
 #리뷰 작성 기능 
-# class CreateReview(APIView):
-#     def post(self, request):
-#         reviews = Review.objects.filter()
-#         serializer = ReviewSerializer(data=request.data, partial = True)
-#         if serializer.is_valid():
-#             serializer.save(reviews = reviews)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
-def review_create(request, pd_id) :
-    hobby_rv = Hobby.objects.get(pk = pd_id)
-    serializer = ReviewSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True) :
-        serializer.save(hobby_rv=hobby_rv,) # 해당 글에 댓글쓰기
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-class reviewViewSet(ModelViewSet):
-    queryset = Hobby.objects.all()
-    serializer_class = ReviewSerializer
-
-    # def pre_save(self, obj):
-    #     print(1)
-    #     obj.samplesheet = self.request.FILES.get('image')
+class CreateReview(APIView):
+    def post(self, request):
+        serializer = ReviewSerializer(data=request.data, partial = True)
+        if serializer.is_valid():           
+            serializer.save(data = request.data, request = request)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-#     def create(self, request, pd_id):
-#         reviews = Hobby.objects.get(pk=pd_id)
-#         serializer = ReviewSerializer(data=request.data) 
-#         print(reviews)
-#         if serializer.is_valid():
-#             serializer.save(pd_id = reviews)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         else:
-#             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, review_id):
+        
+        review = Review.objects.get(pk = review_id)
+        serializer = ReviewSerializer(review, data=request.data, partial = True)
+        
+        if serializer.is_valid():
+            serializer.save(data = request.data, request = request)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
