@@ -8,9 +8,9 @@ from .views import GetHobby, CreateReview
 
 urlpatterns = [
     path('hobby', GetHobby.as_view(), name="viewsGetHobby"),
-    path('<int:pd_id>', views.getHobby, name="getHobby"),
+    path('hobby/<int:pd_id>', views.getHobby, name="getHobby"),
     path('<int:hobby_rv>/reviews', views.get_reviews, name="get_reviews"),
-    path('<int:pd_id>/review/<int:review_id>', views.reviewDetail, name="review_RUD"),
+    path('review/<int:pd_id>/<int:review_id>', views.reviewDetail, name="review_RUD"),
     path('review/<int:review_id>', views.CreateReview.as_view()),
     path('review/', views.CreateReview.as_view()),
 
