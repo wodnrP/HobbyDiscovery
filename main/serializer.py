@@ -1,6 +1,7 @@
 from requests import request
 from rest_framework import serializers
 from .models import Hobby, Review, HobbyImage, Review_Image
+from user.models import User
 
 class RvImageSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(use_url=True)
@@ -23,8 +24,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         
 
     def create(self, instance, **validated_data):
+        user_instance = User.objects.filter(id = instance['data']['user']).first()
         review_obj = Review.objects.create(title = instance["title"], body= instance["body"], grade= instance["grade"],
-        hobby_rv = instance["hobby_rv"], user= instance["user"])
+        hobby_rv = instance["hobby_rv"], user = user_instance)
+
         
         image_set = instance['request'].FILES
         for image_data in image_set.getlist('image'):
