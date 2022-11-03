@@ -10,6 +10,9 @@ from .models import Hobby, Review, Review_Image
 from rest_framework.pagination import PageNumberPagination
 from django.db.models import Count
 import math
+from rest_framework.exceptions import APIException, AuthenticationFailed
+from rest_framework.authentication import get_authorization_header
+from user.authentication import create_access_token, create_refresh_token, decode_access_token, decode_refresh_token, access_token_exp
 
 
 # Create your views here.
@@ -113,20 +116,33 @@ def  reviewDetail(request, review_id, pd_id):
 #리뷰 작성 기능 
 class CreateReview(APIView):
     def post(self, request):
-        serializer = ReviewSerializer(data=request.data, partial = True)
-        if serializer.is_valid():           
-            serializer.save(data = request.data, request = request)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        auth = get_authorization_header(request).split()
+        if auth and len(auth) == 2:
+            token = auth[1].decode('utf-8')
+            id = decode_access_token(token)
+            review_image = request.GET.get('image', None)
+            review_data = {
+                "user": id, 
+                "title": request.data["title"], 
+                "body": request.data["body"], 
+                "grade": request.data["grade"],
+                "hobby_rv": request.data["hobby_rv"], 
+                "image": review_image,
+            }
+            serializer = ReviewSerializer(data=request.data, partial = True)
+            if serializer.is_valid(): 
+                serializer.save(data=review_data, request = request)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def patch(self, request, review_id):
+    # def patch(self, request, review_id):
         
-        review = Review.objects.get(pk = review_id)
-        serializer = ReviewSerializer(review, data=request.data, partial = True)
+    #     review = Review.objects.get(pk = review_id)
+    #     serializer = ReviewSerializer(review, data=request.data, partial = True)
         
-        if serializer.is_valid():
-            serializer.save(data = request.data, request = request)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     if serializer.is_valid():
+    #         serializer.save(data = request.data, request = request)
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 

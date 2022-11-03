@@ -32,10 +32,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
         return review_obj
 
-    def update(self, review, validated_data):
-        review.title = validated_data.get('title', review.title)
-        review.body = validated_data.get('body', review.body)
-        review.grade = validated_data.get('grade', review.grade)
+    # def update(self, review, validated_data):
+    #     print("d")
+    #     review.title = validated_data.get('title', review.title)
+    #     review.body = validated_data.get('body', review.body)
+    #     review.grade = validated_data.get('grade', review.grade)
         # Review_Image.images = validated_data.get('image', Review_Image.image)
         # print(1)
         # print(review.id)
